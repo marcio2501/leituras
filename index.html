@@ -1,0 +1,720 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carta do Dia</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    font-family:Georgia, serif;
+    background:linear-gradient(
+        180deg,
+        #30598f 0%,
+        #253a7a 40%,
+        #1f2d6d 100%
+    );
+    color:#fff;
+}
+
+/* SPLASH */
+
+#splash{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(
+        180deg,
+        #30598f 0%,
+        #253a7a 40%,
+        #1f2d6d 100%
+    );
+}
+
+.avatar-container{
+    position:relative;
+    width:320px;
+    height:320px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.aura{
+    position:absolute;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:radial-gradient(
+        circle,
+        rgba(255,193,7,1) 0%,
+        rgba(255,193,7,.5) 50%,
+        transparent 80%
+    );
+    animation:pulse 2s infinite;
+}
+
+.ring{
+    position:absolute;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:10px solid rgba(255,193,7,.8);
+    animation:ring 3s linear infinite;
+}
+
+.ring:nth-child(2){
+    animation-delay:1s;
+}
+
+.ring:nth-child(3){
+    animation-delay:2s;
+}
+
+.avatar-circle{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    border:4px solid #ffd54f;
+    overflow:hidden;
+    z-index:2;
+}
+
+.avatar-circle img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+@keyframes pulse{
+    0%,100%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.15);
+    }
+}
+
+@keyframes ring{
+    from{
+        transform:scale(.8);
+        opacity:1;
+    }
+
+    to{
+        transform:scale(2.5);
+        opacity:0;
+    }
+}
+
+/* TELA PRINCIPAL */
+
+#app{
+    display:none;
+    width:100%;
+    height:100%;
+    position:relative;
+}
+
+.top{
+    text-align:center;
+    padding-top:20px;
+}
+
+.avatar-top{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    margin:auto;
+    border:3px solid #fff3d0;
+    overflow:hidden;
+}
+
+.avatar-top img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.title{
+    margin-top:10px;
+    color:#f2d8a5;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.subtitle{
+    font-size:18px;
+    margin-top:5px;
+}
+
+.drop-zone{
+    width:160px;
+    height:260px;
+    border-radius:20px;
+    border:3px solid rgba(255,255,255,.35);
+    margin:30px auto 15px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:60px;
+    color:#f2d8a5;
+}
+
+.drop-zone.active{
+    border-color:#ffd54f;
+    box-shadow:0 0 30px rgba(255,193,7,.7);
+}
+
+.instruction{
+    text-align:center;
+    font-size:18px;
+    color:#fff4da;
+}
+
+.carousel-wrapper{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:420px;
+    overflow:hidden;
+}
+
+.carousel{
+    position:absolute;
+    bottom:0;
+    width:100%;
+    height:240px;
+}
+
+.card{
+    position:absolute;
+    width:120px;
+    height:190px;
+    border-radius:12px;
+    cursor:pointer;
+    touch-action:none;
+    transition:transform .25s;
+    border-radius:12px;
+    cursor:pointer;
+    touch-action:none;
+    transition:transform .25s;
+}
+
+.card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:12px;
+}
+
+.footer{
+    position:absolute;
+    bottom:20px;
+    width:100%;
+    text-align:center;
+    color:#f2d8a5;
+    font-size:22px;
+}
+
+.footer span{
+    display:block;
+    margin-bottom:10px;
+    font-size:32px;
+}
+
+.selected-card{
+    width:160px !important;
+    height:260px !important;
+}
+
+.revealed{
+    animation:showCard .6s;
+}
+
+@keyframes showCard{
+    from{
+        transform:scale(.5) rotateY(180deg);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="splash">
+
+    <div class="avatar-container">
+
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+
+        <div class="aura"></div>
+
+        <div class="avatar-circle">
+    <img src="https://i.ibb.co/SDBTpS54/Chat-GPT-Image-15-06-2026-19-02-37-removebg-preview.png" alt="Avatar">
+</div>
+
+    </div>
+
+</div>
+
+<div id="app">
+
+    <div class="top">
+
+        <div class="avatar-top">
+    <img src="https://i.ibb.co/SDBTpS54/Chat-GPT-Image-15-06-2026-19-02-37-removebg-preview.png" alt="Avatar">
+</div>
+
+        <div class="title">
+            1 carta • Eu
+        </div>
+
+        <div class="subtitle">
+            Carta do Dia
+        </div>
+
+    </div>
+
+    <div id="dropZone" class="drop-zone">
+        +
+    </div>
+
+    <div class="instruction">
+        Arraste a carta para o espaço vazio
+    </div>
+
+    <div class="carousel-wrapper">
+        <div id="carousel" class="carousel"></div>
+    </div>
+
+    <div class="footer">
+        <span>↔</span>
+        Deslize para mover
+    </div>
+
+</div>
+
+<script>
+
+/* ========= CONFIG ========= */
+
+const cardNames = [
+"ancora",
+"anel",
+"arvore",
+"cachorro",
+"caixao",
+"caminhos",
+"casa",
+"cavaleiro",
+"cegonha",
+"chave",
+"chicote",
+"cobra",
+"coracao",
+"crianca",
+"cruz",
+"envelope",
+"estrela",
+"foice",
+"fonte",
+"homem",
+"lirios",
+"livro",
+"lua",
+"montanha",
+"mulher",
+"navio",
+"passaros",
+"peixes",
+"raposa",
+"rato",
+"rosas",
+"sol",
+"tempestade",
+"torre",
+"trevo",
+"urso"
+];
+/* ========= SPLASH ========= */
+
+setTimeout(() => {
+
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+}, 5000);
+
+/* ========= ELEMENTOS ========= */
+
+const carousel = document.getElementById("carousel");
+const dropZone = document.getElementById("dropZone");
+
+let chosen = false;
+
+/* ========= CRIAR CARTAS ========= */
+
+cardNames.forEach((name,index)=>{
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.dataset.front = `cards/${name}.png`;
+
+    card.innerHTML = `
+        <img src="imagem/verso.png">
+    `;
+
+    carousel.appendChild(card);
+
+});
+
+/* ========= POSICIONAR ========= */
+
+const cards = [...document.querySelectorAll(".card")];
+
+function arrangeCards(){
+
+    const centerX = window.innerWidth / 2;
+    const radius = 900;
+
+    const startAngle = -28;
+    const endAngle = 28;
+
+    cards.forEach((card,index)=>{
+
+        const angle =
+        startAngle +
+        ((endAngle - startAngle) /
+        (cards.length - 1)) *
+        index;
+
+        const rad =
+        angle * Math.PI / 180;
+
+        const x =
+        centerX +
+        Math.sin(rad) * radius;
+
+        const y =
+        Math.cos(rad) * radius;
+
+        card.style.left =
+        (x - 60) + "px";
+
+        card.style.bottom =
+        (-720 + y) + "px";
+
+        card.style.transform =
+        `rotate(${angle}deg)`;
+
+        card.style.zIndex =
+        index;
+
+    });
+
+}
+
+arrangeCards();
+
+window.addEventListener(
+"resize",
+arrangeCards
+);
+
+/* ========= DRAG ========= */
+
+cards.forEach(card=>{
+
+    let startX = 0;
+    let startY = 0;
+
+    let currentX = 0;
+    let currentY = 0;
+
+    let dragging = false;
+
+    card.addEventListener(
+    "pointerdown",
+    e=>{
+
+        if(chosen) return;
+
+        dragging = true;
+
+        startX =
+        e.clientX - currentX;
+
+        startY =
+        e.clientY - currentY;
+
+        card.style.zIndex = 999;
+
+    });
+
+    window.addEventListener(
+    "pointermove",
+    e=>{
+
+        if(!dragging) return;
+
+        currentX =
+        e.clientX - startX;
+
+        currentY =
+        e.clientY - startY;
+
+        card.style.transform =
+        `translate(${currentX}px, ${currentY}px)`;
+
+        const dropRect =
+        dropZone.getBoundingClientRect();
+
+        const cardRect =
+        card.getBoundingClientRect();
+
+        const overlap =
+        cardRect.left < dropRect.right &&
+        cardRect.right > dropRect.left &&
+        cardRect.top < dropRect.bottom &&
+        cardRect.bottom > dropRect.top;
+
+        if(overlap){
+
+            dropZone.classList.add(
+            "active"
+            );
+
+        }else{
+
+            dropZone.classList.remove(
+            "active"
+            );
+
+        }
+
+    });
+
+    window.addEventListener(
+    "pointerup",
+    ()=>{
+
+        if(!dragging) return;
+
+        dragging = false;
+
+        const dropRect =
+        dropZone.getBoundingClientRect();
+
+        const cardRect =
+        card.getBoundingClientRect();
+
+        const overlap =
+        cardRect.left < dropRect.right &&
+        cardRect.right > dropRect.left &&
+        cardRect.top < dropRect.bottom &&
+        cardRect.bottom > dropRect.top;
+
+        if(overlap){
+
+            revealCard(card);
+
+        }else{
+
+            card.style.transition =
+            ".4s";
+
+            card.style.transform =
+            "";
+
+            setTimeout(()=>{
+
+                card.style.transition =
+                "";
+
+            },400);
+
+        }
+
+        dropZone.classList.remove(
+        "active"
+        );
+
+    });
+
+});
+
+/* ========= REVELAR ========= */
+
+function revealCard(card){
+
+    if(chosen) return;
+
+    chosen = true;
+
+    cards.forEach(c=>{
+
+        if(c !== card){
+
+            c.style.opacity = "0";
+            c.style.pointerEvents = "none";
+
+        }
+
+    });
+
+    const front =
+    card.dataset.front;
+
+    card.innerHTML =
+    `<img src="${front}">`;
+
+    card.classList.add(
+    "selected-card"
+    );
+
+    card.classList.add(
+    "revealed"
+    );
+
+    card.style.position =
+    "fixed";
+
+    card.style.left =
+    "50%";
+
+    card.style.top =
+    "50%";
+
+    card.style.bottom =
+    "auto";
+
+    card.style.transform =
+    "translate(-50%,-50%)";
+
+    card.style.zIndex =
+    "9999";
+
+    dropZone.innerHTML = "";
+
+    dropZone.style.opacity =
+    "0";
+
+    document.querySelector(
+    ".instruction"
+    ).innerHTML =
+    "Sua carta foi escolhida";
+
+    document.querySelector(
+    ".footer"
+    ).style.display =
+    "none";
+
+}
+
+/* ========= CARROSSEL ========= */
+
+let scrollOffset = 0;
+let lastX = 0;
+
+carousel.addEventListener(
+"pointerdown",
+e=>{
+
+    if(chosen) return;
+
+    isMoving = true;
+    lastX = e.clientX;
+
+});
+
+window.addEventListener(
+"pointermove",
+e=>{
+
+    if(!isMoving || chosen) return;
+
+    const delta =
+    e.clientX - lastX;
+
+    scrollOffset += delta;
+    lastX = e.clientX;
+
+    cards.forEach((card,index)=>{
+
+        const centerX =
+        window.innerWidth / 2;
+
+        const radius = 900;
+
+        const startAngle = -28;
+        const endAngle = 28;
+
+        const angle =
+        startAngle +
+        ((endAngle - startAngle) /
+        (cards.length - 1)) *
+        index +
+        (scrollOffset * 0.08);
+
+        const rad =
+        angle * Math.PI / 180;
+
+        const x =
+        centerX +
+        Math.sin(rad) * radius;
+
+        const y =
+        Math.cos(rad) * radius;
+
+        card.style.left =
+        (x - 60) + "px";
+
+        card.style.bottom =
+        (-720 + y) + "px";
+
+        card.style.transform =
+        `rotate(${angle}deg)`;
+
+    });
+
+});
+
+window.addEventListener(
+"pointerup",
+()=>{
+
+    isMoving = false;
+
+});
+
+</script>
+
+</body>
+</html>
