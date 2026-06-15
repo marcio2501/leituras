@@ -385,11 +385,12 @@ cardNames.forEach((name,index)=>{
     const card = document.createElement("div");
     card.className = "card";
 
-    card.dataset.front = `cards/${name}.png`;
+    card.dataset.front = `cards/${name}.jpg
 
     card.innerHTML = `
-        <img src="imagem/verso.png">
-    `;
+        card.innerHTML = `
+<img src="imagem/verso.jpg">
+`;
 
     carousel.appendChild(card);
 
