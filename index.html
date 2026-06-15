@@ -385,13 +385,11 @@ cardNames.forEach((name,index)=>{
     const card = document.createElement("div");
     card.className = "card";
 
-    card.dataset.front = `cards/${name}.jpg
+   card.dataset.front = `cards/${name}.jpg`;
 
-    card.innerHTML = `
-        card.innerHTML = `
+card.innerHTML = `
 <img src="imagem/verso.jpg">
 `;
-
     carousel.appendChild(card);
 
 });
@@ -575,67 +573,76 @@ cards.forEach(card=>{
 
 function revealCard(card){
 
-    if(chosen) return;
+if(chosen) return;
 
-    chosen = true;
+chosen = true;
 
-    cards.forEach(c=>{
+cards.forEach(c=>{
 
-        if(c !== card){
+    if(c !== card){
 
-            c.style.opacity = "0";
-            c.style.pointerEvents = "none";
+        c.style.opacity = "0";
+        c.style.pointerEvents = "none";
 
-        }
+    }
 
-    });
+});
 
-    const front =
-    card.dataset.front;
+const front =
+card.dataset.front;
 
-    card.innerHTML =
-    `<img src="${front}">`;
+card.innerHTML =
+`<img src="${front}">`;
 
-    card.classList.add(
-    "selected-card"
-    );
+card.classList.add(
+"selected-card"
+);
 
-    card.classList.add(
-    "revealed"
-    );
+card.classList.add(
+"revealed"
+);
 
-    card.style.position =
-    "fixed";
+const dropRect =
+dropZone.getBoundingClientRect();
 
-    card.style.left =
-    "50%";
+card.style.position =
+"fixed";
 
-    card.style.top =
-    "50%";
+card.style.left =
+dropRect.left + "px";
 
-    card.style.bottom =
-    "auto";
+card.style.top =
+dropRect.top + "px";
 
-    card.style.transform =
-    "translate(-50%,-50%)";
+card.style.bottom =
+"auto";
 
-    card.style.zIndex =
-    "9999";
+card.style.transform =
+"none";
 
-    dropZone.innerHTML = "";
+card.style.width =
+"160px";
 
-    dropZone.style.opacity =
-    "0";
+card.style.height =
+"260px";
 
-    document.querySelector(
-    ".instruction"
-    ).innerHTML =
-    "Sua carta foi escolhida";
+card.style.zIndex =
+"9999";
 
-    document.querySelector(
-    ".footer"
-    ).style.display =
-    "none";
+dropZone.innerHTML = "";
+
+dropZone.style.border =
+"none";
+
+document.querySelector(
+".instruction"
+).innerHTML =
+"Sua carta foi escolhida";
+
+document.querySelector(
+".footer"
+).style.display =
+"none";
 
 }
 
