@@ -168,36 +168,58 @@ body{
     height:240px;
     border-radius:20px;
     border:3px solid rgba(255,255,255,.35);
+
     margin:30px auto 15px;
+
     display:flex;
     justify-content:center;
     align-items:center;
+
     font-size:60px;
     color:#f2d8a5;
 
     position:relative;
-    overflow:hidden;
+
+    overflow:visible;
+
+    z-index:1;
+
+    transition:
+    border-color .3s ease,
+    box-shadow .3s ease,
+    transform .3s ease;
 }
+
 .drop-zone.active{
+
     border-color:#ffd54f;
-    box-shadow:0 0 30px rgba(255,193,7,.7);
+
+    box-shadow:
+    0 0 30px rgba(255,193,7,.7);
+
+    transform:scale(1.03);
 }
 
 .instruction{
     text-align:center;
     font-size:18px;
     color:#fff4da;
+    position:relative;
+    z-index:2;
 }
 
 .carousel-wrapper{
     position:absolute;
     bottom:0;
     left:0;
+
     width:100%;
     height:420px;
-    overflow:hidden;
-}
 
+    overflow:hidden;
+
+    z-index:10;
+}
 .carousel{
     position:absolute;
     bottom:0;
@@ -212,13 +234,26 @@ body{
     border-radius:12px;
     cursor:pointer;
     touch-action:none;
-    transition:.25s;
+
+    z-index:100;
+    will-change:transform,left,top;
+
+    transition:
+    transform .25s ease,
+    left .25s ease,
+    top .25s ease,
+    width .25s ease,
+    height .25s ease;
+
+    transform-origin:center center;
 }
+
 .card img{
     width:100%;
     height:100%;
     object-fit:cover;
     border-radius:12px;
+    display:block;
 }
 
 .footer{
@@ -228,6 +263,7 @@ body{
     text-align:center;
     color:#f2d8a5;
     font-size:22px;
+    z-index:5;
 }
 
 .footer span{
@@ -239,23 +275,30 @@ body{
 .selected-card{
     width:150px !important;
     height:240px !important;
+    z-index:99999 !important;
 }
+
 .revealed{
-    animation:showCard .6s;
+    animation:showCard .6s ease;
 }
 
 @keyframes showCard{
+
     from{
-        transform:scale(.5) rotateY(180deg);
         opacity:0;
+        transform:
+        scale(.85)
+        rotateY(180deg);
     }
 
     to{
-        transform:scale(1);
         opacity:1;
+        transform:
+        scale(1)
+        rotateY(0deg);
     }
-}
 
+}
 </style>
 </head>
 
@@ -413,6 +456,10 @@ function arrangeCards(){
 
     cards.forEach((card,index)=>{
 
+        if(card.classList.contains(
+        "selected-card"
+        )) return;
+
         const angle =
         startAngle +
         ((endAngle - startAngle) /
@@ -429,8 +476,17 @@ function arrangeCards(){
         const y =
         Math.cos(rad) * radius;
 
+        card.dataset.angle =
+        angle;
+
+        card.style.position =
+        "absolute";
+
         card.style.left =
         (x - 48) + "px";
+
+        card.style.top =
+        "auto";
 
         card.style.bottom =
         (
@@ -452,24 +508,13 @@ function arrangeCards(){
 arrangeCards();
 
 window.addEventListener(
-    "resize",
-    arrangeCards
+"resize",
+arrangeCards
 );
-arrangeCards();
 
-window.addEventListener(
-    "resize",
-    arrangeCards
-);
 /* ========= DRAG ========= */
 
 cards.forEach(card=>{
-
-    let startX = 0;
-    let startY = 0;
-
-    let currentX = 0;
-    let currentY = 0;
 
     let dragging = false;
 
@@ -481,13 +526,14 @@ cards.forEach(card=>{
 
         dragging = true;
 
-        startX =
-        e.clientX - currentX;
+        card.style.transition =
+        "none";
 
-        startY =
-        e.clientY - currentY;
+        card.style.zIndex =
+        "99999";
 
-        card.style.zIndex = 999;
+        card.style.transform =
+        "rotate(0deg) scale(1.08)";
 
     });
 
@@ -497,14 +543,31 @@ cards.forEach(card=>{
 
         if(!dragging) return;
 
-        currentX =
-        e.clientX - startX;
+        const cardWidth =
+        card.offsetWidth;
 
-        currentY =
-        e.clientY - startY;
+        const cardHeight =
+        card.offsetHeight;
+
+        card.style.position =
+        "fixed";
+
+        card.style.left =
+        (e.clientX - cardWidth / 2)
+        + "px";
+
+        card.style.top =
+        (e.clientY - cardHeight / 2)
+        + "px";
+
+        card.style.bottom =
+        "auto";
 
         card.style.transform =
-        `translate(${currentX}px, ${currentY}px)`;
+        "rotate(0deg) scale(1.05)";
+
+        card.style.zIndex =
+        "99999";
 
         const dropRect =
         dropZone.getBoundingClientRect();
@@ -513,10 +576,18 @@ cards.forEach(card=>{
         card.getBoundingClientRect();
 
         const overlap =
-        cardRect.left < dropRect.right &&
-        cardRect.right > dropRect.left &&
-        cardRect.top < dropRect.bottom &&
-        cardRect.bottom > dropRect.top;
+
+        cardRect.left <
+        dropRect.right + 40 &&
+
+        cardRect.right >
+        dropRect.left - 40 &&
+
+        cardRect.top <
+        dropRect.bottom + 40 &&
+
+        cardRect.bottom >
+        dropRect.top - 40;
 
         if(overlap){
 
@@ -549,10 +620,18 @@ cards.forEach(card=>{
         card.getBoundingClientRect();
 
         const overlap =
-        cardRect.left < dropRect.right &&
-        cardRect.right > dropRect.left &&
-        cardRect.top < dropRect.bottom &&
-        cardRect.bottom > dropRect.top;
+
+        cardRect.left <
+        dropRect.right + 40 &&
+
+        cardRect.right >
+        dropRect.left - 40 &&
+
+        cardRect.top <
+        dropRect.bottom + 40 &&
+
+        cardRect.bottom >
+        dropRect.top - 40;
 
         if(overlap){
 
@@ -561,17 +640,9 @@ cards.forEach(card=>{
         }else{
 
             card.style.transition =
-            ".4s";
+            "all .35s ease";
 
-            card.style.transform =
-            "";
-
-            setTimeout(()=>{
-
-                card.style.transition =
-                "";
-
-            },400);
+            arrangeCards();
 
         }
 
@@ -582,98 +653,113 @@ cards.forEach(card=>{
     });
 
 });
-
 /* ========= REVELAR ========= */
 
 function revealCard(card){
 
-if(chosen) return;
+    if(chosen) return;
 
-chosen = true;
+    chosen = true;
 
-cards.forEach(c=>{
+    cards.forEach(c=>{
 
-    if(c !== card){
+        if(c !== card){
 
-        c.style.opacity = "0";
-        c.style.pointerEvents = "none";
+            c.style.opacity = "0";
+            c.style.pointerEvents = "none";
 
-    }
+        }
 
-});
+    });
 
-const randomCard =
-cardNames[
-Math.floor(
-Math.random() *
-cardNames.length
-)
-];
+    const randomCard =
+    cardNames[
+        Math.floor(
+            Math.random() *
+            cardNames.length
+        )
+    ];
 
-const front =
-`cards/${randomCard}.jpg`;
+    const front =
+    `cards/${randomCard}.jpg`;
 
-const dropRect =
-dropZone.getBoundingClientRect();
+    const dropRect =
+    dropZone.getBoundingClientRect();
 
-card.style.transition =
-"all .35s ease";
+    const cardRect =
+    card.getBoundingClientRect();
 
-card.style.position =
-"fixed";
-
-card.style.left =
-card.getBoundingClientRect().left + "px";
-
-card.style.top =
-card.getBoundingClientRect().top + "px";
-
-card.style.width =
-"95px";
-
-card.style.height =
-"150px";
-
-card.style.zIndex =
-"9999";
-
-requestAnimationFrame(()=>{
+    card.style.position =
+    "fixed";
 
     card.style.left =
-    dropRect.left + "px";
+    cardRect.left + "px";
 
     card.style.top =
-    dropRect.top + "px";
+    cardRect.top + "px";
 
-    card.style.width =
-    "150px";
+    card.style.bottom =
+    "auto";
 
-    card.style.height =
-    "240px";
+    card.style.transition =
+    "all .45s ease";
 
-    card.style.transform =
-    "rotate(0deg)";
+    card.style.zIndex =
+    "99999";
 
-});
+    requestAnimationFrame(()=>{
 
-setTimeout(()=>{
+        card.style.left =
+        dropRect.left + "px";
 
-    card.innerHTML =
-    `<img src="${front}">`;
+        card.style.top =
+        dropRect.top + "px";
 
-    card.classList.add(
-    "revealed"
-    );
+        card.style.width =
+        "150px";
 
-    dropZone.style.border =
-    "none";
+        card.style.height =
+        "240px";
 
-    dropZone.style.boxShadow =
-    "none";
+        card.style.transform =
+        "rotate(0deg) scale(1)";
 
-},350);
+    });
 
-dropZone.innerHTML = "";
+    setTimeout(()=>{
+
+        card.innerHTML =
+        `<img src="${front}">`;
+
+        card.classList.add(
+        "selected-card"
+        );
+
+        card.classList.add(
+        "revealed"
+        );
+
+        dropZone.style.border =
+        "none";
+
+        dropZone.style.boxShadow =
+        "none";
+
+        dropZone.style.background =
+        "transparent";
+
+        document.querySelector(
+        ".instruction"
+        ).innerHTML =
+        "Sua carta foi escolhida";
+
+        document.querySelector(
+        ".footer"
+        ).style.display =
+        "none";
+
+    },450);
+
 }
 /* ========= CARROSSEL ========= */
 
@@ -721,6 +807,10 @@ e=>{
     isMobile ? 36 : 34;
 
     cards.forEach((card,index)=>{
+
+        if(card.classList.contains(
+        "selected-card"
+        )) return;
 
         const angle =
         startAngle +
