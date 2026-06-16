@@ -515,7 +515,7 @@ function autoSpin(){
 
     if(autoRotate && !chosen){
 
-        scrollOffset += 0.01;
+        scrollOffset += 0.25;
 
         updateCarousel();
 
@@ -560,12 +560,11 @@ function updateCarousel(){
         return;
 
         const angle =
-        startAngle +
-        ((endAngle-startAngle) /
-        (cards.length-1))
-        * index +
-        scrollOffset;
-
+startAngle +
+((endAngle-startAngle) /
+(cards.length-1))
+* index +
+(scrollOffset * 0.03);
         const rad =
         angle * Math.PI / 180;
 
@@ -604,7 +603,7 @@ cards.forEach(card=>{
 
     card.addEventListener(
     "pointerdown",
-    e=>{
+    ()=>{
 
         if(chosen) return;
 
@@ -612,22 +611,19 @@ cards.forEach(card=>{
 
         holdTimer = setTimeout(()=>{
 
-    draggingCard = card;
+            draggingCard = card;
 
-    dragging = true;
+            dragging = true;
 
-    isMoving = false;
+            isMoving = false;
 
-    card.style.transition =
-    "none";
+            card.style.transition =
+            "none";
 
-    card.style.zIndex =
-    "99999";
+            card.style.zIndex =
+            "99999";
 
-    card.style.transform =
-    "rotate(0deg) scale(1.08)";
-
-},300);
+        },600);
 
     });
 
@@ -655,35 +651,28 @@ cards.forEach(card=>{
     "pointermove",
     e=>{
 
-        if(!dragging){
-            return;
-        }
+        if(!dragging) return;
 
-        const cardWidth =
+        const w =
         card.offsetWidth;
 
-        const cardHeight =
+        const h =
         card.offsetHeight;
 
         card.style.position =
         "fixed";
 
         card.style.left =
-        (e.clientX - cardWidth/2)
-        + "px";
+        (e.clientX - w/2) + "px";
 
         card.style.top =
-        (e.clientY - cardHeight/2)
-        + "px";
+        (e.clientY - h/2) + "px";
 
         card.style.bottom =
         "auto";
 
         card.style.transform =
-        "rotate(0deg) scale(1.05)";
-
-        card.style.zIndex =
-        "99999";
+        "scale(1.05)";
 
         const dropRect =
         dropZone.getBoundingClientRect();
@@ -729,9 +718,7 @@ cards.forEach(card=>{
         holdTimer
         );
 
-        if(!dragging){
-            return;
-        }
+        if(!dragging) return;
 
         dragging = false;
 
@@ -761,20 +748,22 @@ cards.forEach(card=>{
 
         }else{
 
-            draggingCard = null;
+            draggingCard =
+            null;
 
-card.style.position =
-"absolute";
+            card.style.position =
+            "absolute";
 
-card.style.top =
-"auto";
+            card.style.top =
+            "auto";
 
-card.style.transition =
-"all .35s ease";
+            card.style.transition =
+            "all .35s ease";
 
-updateCarousel();
+            updateCarousel();
 
-}
+        }
+
         dropZone.classList.remove(
         "active"
         );
@@ -782,7 +771,6 @@ updateCarousel();
     });
 
 });
-
 /* ========= REVELAR ========= */
 
 function revealCard(card){
@@ -922,7 +910,7 @@ e=>{
     const delta =
     e.clientX - lastX;
 
-    scrollOffset += delta * 0.12;
+    scrollOffset += delta * 0.08;
 
     lastX = e.clientX;
 
