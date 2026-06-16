@@ -400,11 +400,14 @@ const cards = [...document.querySelectorAll(".card")];
 
 function arrangeCards(){
 
-    const centerX = window.innerWidth / 2;
-    const radius = 900;
+    const isMobile = window.innerWidth < 700;
 
-    const startAngle = -28;
-    const endAngle = 28;
+    const centerX = window.innerWidth / 2;
+
+    const radius = isMobile ? 520 : 950;
+
+    const startAngle = isMobile ? -48 : -40;
+    const endAngle   = isMobile ? 48 : 40;
 
     cards.forEach((card,index)=>{
 
@@ -425,10 +428,10 @@ function arrangeCards(){
         Math.cos(rad) * radius;
 
         card.style.left =
-        (x - 60) + "px";
+        (x - (isMobile ? 55 : 60)) + "px";
 
         card.style.bottom =
-        (-720 + y) + "px";
+        (isMobile ? (-410 + y) : (-760 + y)) + "px";
 
         card.style.transform =
         `rotate(${angle}deg)`;
@@ -439,7 +442,6 @@ function arrangeCards(){
     });
 
 }
-
 arrangeCards();
 
 window.addEventListener(
@@ -588,8 +590,16 @@ cards.forEach(c=>{
 
 });
 
+const randomCard =
+cardNames[
+Math.floor(
+Math.random() *
+cardNames.length
+)
+];
+
 const front =
-card.dataset.front;
+`cards/${randomCard}.jpg`;
 
 card.innerHTML =
 `<img src="${front}">`;
@@ -608,12 +618,8 @@ dropZone.getBoundingClientRect();
 card.style.position =
 "fixed";
 
-card.style.left =
-dropRect.left + "px";
-
-card.style.top =
-dropRect.top + "px";
-
+card.style.transition =
+"all .8s cubic-bezier(.22,.61,.36,1)";
 card.style.bottom =
 "auto";
 
@@ -628,7 +634,15 @@ card.style.height =
 
 card.style.zIndex =
 "9999";
+requestAnimationFrame(()=>{
 
+    card.style.left =
+    dropRect.left + "px";
+
+    card.style.top =
+    dropRect.top + "px";
+
+});
 dropZone.innerHTML = "";
 
 dropZone.style.border =
@@ -649,6 +663,7 @@ document.querySelector(
 /* ========= CARROSSEL ========= */
 
 let scrollOffset = 0;
+let isMoving = false;
 let lastX = 0;
 
 carousel.addEventListener(
@@ -671,25 +686,33 @@ e=>{
     const delta =
     e.clientX - lastX;
 
-    scrollOffset += delta;
+    scrollOffset += delta * 0.4;
+
     lastX = e.clientX;
+
+    const isMobile =
+    window.innerWidth < 700;
+
+    const centerX =
+    window.innerWidth / 2;
+
+    const radius =
+    isMobile ? 520 : 950;
 
     cards.forEach((card,index)=>{
 
-        const centerX =
-        window.innerWidth / 2;
+        const startAngle =
+        isMobile ? -48 : -40;
 
-        const radius = 900;
-
-        const startAngle = -28;
-        const endAngle = 28;
+        const endAngle =
+        isMobile ? 48 : 40;
 
         const angle =
         startAngle +
-        ((endAngle - startAngle) /
-        (cards.length - 1)) *
+        ((endAngle-startAngle)/
+        (cards.length-1)) *
         index +
-        (scrollOffset * 0.08);
+        (scrollOffset * 0.03);
 
         const rad =
         angle * Math.PI / 180;
@@ -702,10 +725,13 @@ e=>{
         Math.cos(rad) * radius;
 
         card.style.left =
-        (x - 60) + "px";
+        (x - (isMobile ? 55 : 60))
+        + "px";
 
         card.style.bottom =
-        (-720 + y) + "px";
+        (isMobile ? (-410+y)
+        : (-760+y))
+        + "px";
 
         card.style.transform =
         `rotate(${angle}deg)`;
@@ -721,7 +747,6 @@ window.addEventListener(
     isMoving = false;
 
 });
-
 </script>
 
 </body>
