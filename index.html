@@ -212,6 +212,10 @@ body{
     font-size:18px;
     color:#7a4f00;
     font-weight:bold;
+
+    position:relative;
+    z-index:20;
+    margin-bottom:40px;
 }
 .carousel-wrapper{
     position:absolute;
@@ -219,10 +223,9 @@ body{
     left:0;
 
     width:100%;
-    height:420px;
+    height:320px; /* antes 420px */
 
     overflow:hidden;
-
     z-index:10;
 }
 .carousel{
@@ -456,7 +459,7 @@ function arrangeCards(){
     window.innerWidth / 2;
 
     const radius =
-    mobile ? 720 : 1200;
+mobile ? 520 : 1200;
 
     const startAngle =
     mobile ? -36 : -34;
