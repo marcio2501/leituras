@@ -164,8 +164,8 @@ body{
 }
 
 .drop-zone{
-    width:160px;
-    height:260px;
+    width:150px;
+    height:240px;
     border-radius:20px;
     border:3px solid rgba(255,255,255,.35);
     margin:30px auto 15px;
@@ -174,8 +174,10 @@ body{
     align-items:center;
     font-size:60px;
     color:#f2d8a5;
-}
 
+    position:relative;
+    overflow:hidden;
+}
 .drop-zone.active{
     border-color:#ffd54f;
     box-shadow:0 0 30px rgba(255,193,7,.7);
@@ -205,18 +207,13 @@ body{
 
 .card{
     position:absolute;
-    width:120px;
-    height:190px;
+    width:95px;
+    height:150px;
     border-radius:12px;
     cursor:pointer;
     touch-action:none;
-    transition:transform .25s;
-    border-radius:12px;
-    cursor:pointer;
-    touch-action:none;
-    transition:transform .25s;
+    transition:.25s;
 }
-
 .card img{
     width:100%;
     height:100%;
@@ -240,10 +237,9 @@ body{
 }
 
 .selected-card{
-    width:160px !important;
-    height:260px !important;
+    width:150px !important;
+    height:240px !important;
 }
-
 .revealed{
     animation:showCard .6s;
 }
@@ -400,22 +396,28 @@ const cards = [...document.querySelectorAll(".card")];
 
 function arrangeCards(){
 
-    const isMobile = window.innerWidth < 700;
+    const mobile =
+    window.innerWidth < 700;
 
-    const centerX = window.innerWidth / 2;
+    const centerX =
+    window.innerWidth / 2;
 
-    const radius = isMobile ? 520 : 950;
+    const radius =
+    mobile ? 720 : 1200;
 
-    const startAngle = isMobile ? -48 : -40;
-    const endAngle   = isMobile ? 48 : 40;
+    const startAngle =
+    mobile ? -36 : -34;
+
+    const endAngle =
+    mobile ? 36 : 34;
 
     cards.forEach((card,index)=>{
 
         const angle =
         startAngle +
         ((endAngle - startAngle) /
-        (cards.length - 1)) *
-        index;
+        (cards.length - 1))
+        * index;
 
         const rad =
         angle * Math.PI / 180;
@@ -428,10 +430,14 @@ function arrangeCards(){
         Math.cos(rad) * radius;
 
         card.style.left =
-        (x - (isMobile ? 55 : 60)) + "px";
+        (x - 48) + "px";
 
         card.style.bottom =
-        (isMobile ? (-410 + y) : (-760 + y)) + "px";
+        (
+            mobile
+            ? (-620 + y)
+            : (-1030 + y)
+        ) + "px";
 
         card.style.transform =
         `rotate(${angle}deg)`;
@@ -442,13 +448,19 @@ function arrangeCards(){
     });
 
 }
+
 arrangeCards();
 
 window.addEventListener(
-"resize",
-arrangeCards
+    "resize",
+    arrangeCards
 );
+arrangeCards();
 
+window.addEventListener(
+    "resize",
+    arrangeCards
+);
 /* ========= DRAG ========= */
 
 cards.forEach(card=>{
@@ -601,39 +613,30 @@ cardNames.length
 const front =
 `cards/${randomCard}.jpg`;
 
-card.innerHTML =
-`<img src="${front}">`;
-
-card.classList.add(
-"selected-card"
-);
-
-card.classList.add(
-"revealed"
-);
-
 const dropRect =
 dropZone.getBoundingClientRect();
+
+card.style.transition =
+"all .35s ease";
 
 card.style.position =
 "fixed";
 
-card.style.transition =
-"all .8s cubic-bezier(.22,.61,.36,1)";
-card.style.bottom =
-"auto";
+card.style.left =
+card.getBoundingClientRect().left + "px";
 
-card.style.transform =
-"none";
+card.style.top =
+card.getBoundingClientRect().top + "px";
 
 card.style.width =
-"160px";
+"95px";
 
 card.style.height =
-"260px";
+"150px";
 
 card.style.zIndex =
 "9999";
+
 requestAnimationFrame(()=>{
 
     card.style.left =
@@ -642,24 +645,36 @@ requestAnimationFrame(()=>{
     card.style.top =
     dropRect.top + "px";
 
+    card.style.width =
+    "150px";
+
+    card.style.height =
+    "240px";
+
+    card.style.transform =
+    "rotate(0deg)";
+
 });
+
+setTimeout(()=>{
+
+    card.innerHTML =
+    `<img src="${front}">`;
+
+    card.classList.add(
+    "revealed"
+    );
+
+    dropZone.style.border =
+    "none";
+
+    dropZone.style.boxShadow =
+    "none";
+
+},350);
+
 dropZone.innerHTML = "";
-
-dropZone.style.border =
-"none";
-
-document.querySelector(
-".instruction"
-).innerHTML =
-"Sua carta foi escolhida";
-
-document.querySelector(
-".footer"
-).style.display =
-"none";
-
 }
-
 /* ========= CARROSSEL ========= */
 
 let scrollOffset = 0;
@@ -697,21 +712,21 @@ e=>{
     window.innerWidth / 2;
 
     const radius =
-    isMobile ? 520 : 950;
+    isMobile ? 720 : 1200;
+
+    const startAngle =
+    isMobile ? -36 : -34;
+
+    const endAngle =
+    isMobile ? 36 : 34;
 
     cards.forEach((card,index)=>{
 
-        const startAngle =
-        isMobile ? -48 : -40;
-
-        const endAngle =
-        isMobile ? 48 : 40;
-
         const angle =
         startAngle +
-        ((endAngle-startAngle)/
-        (cards.length-1)) *
-        index +
+        ((endAngle - startAngle) /
+        (cards.length - 1))
+        * index +
         (scrollOffset * 0.03);
 
         const rad =
@@ -725,13 +740,14 @@ e=>{
         Math.cos(rad) * radius;
 
         card.style.left =
-        (x - (isMobile ? 55 : 60))
-        + "px";
+        (x - 48) + "px";
 
         card.style.bottom =
-        (isMobile ? (-410+y)
-        : (-760+y))
-        + "px";
+        (
+            isMobile
+            ? (-620 + y)
+            : (-1030 + y)
+        ) + "px";
 
         card.style.transform =
         `rotate(${angle}deg)`;
@@ -747,6 +763,7 @@ window.addEventListener(
     isMoving = false;
 
 });
+
 </script>
 
 </body>
