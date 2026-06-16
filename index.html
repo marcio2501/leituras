@@ -499,7 +499,7 @@ function arrangeCards(){
         `rotate(${angle}deg)`;
 
         card.style.zIndex =
-        index;
+1000 + index;
 
     });
 
@@ -517,6 +517,7 @@ arrangeCards
 cards.forEach(card=>{
 
     let dragging = false;
+    let holdTimer = null;
 
     card.addEventListener(
     "pointerdown",
@@ -524,16 +525,40 @@ cards.forEach(card=>{
 
         if(chosen) return;
 
-        dragging = true;
+        holdTimer = setTimeout(()=>{
 
-        card.style.transition =
-        "none";
+            dragging = true;
 
-        card.style.zIndex =
-        "99999";
+            card.style.transition =
+            "none";
 
-        card.style.transform =
-        "rotate(0deg) scale(1.08)";
+            card.style.zIndex =
+            "99999";
+
+            card.style.transform =
+            "rotate(0deg) scale(1.08)";
+
+        },250);
+
+    });
+
+    card.addEventListener(
+    "pointerup",
+    ()=>{
+
+        clearTimeout(
+        holdTimer
+        );
+
+    });
+
+    card.addEventListener(
+    "pointerleave",
+    ()=>{
+
+        clearTimeout(
+        holdTimer
+        );
 
     });
 
@@ -541,7 +566,9 @@ cards.forEach(card=>{
     "pointermove",
     e=>{
 
-        if(!dragging) return;
+        if(!dragging){
+            return;
+        }
 
         const cardWidth =
         card.offsetWidth;
@@ -609,7 +636,13 @@ cards.forEach(card=>{
     "pointerup",
     ()=>{
 
-        if(!dragging) return;
+        clearTimeout(
+        holdTimer
+        );
+
+        if(!dragging){
+            return;
+        }
 
         dragging = false;
 
@@ -653,6 +686,7 @@ cards.forEach(card=>{
     });
 
 });
+
 /* ========= REVELAR ========= */
 
 function revealCard(card){
@@ -739,6 +773,8 @@ function revealCard(card){
         "revealed"
         );
 
+        dropZone.innerHTML = "";
+
         dropZone.style.border =
         "none";
 
@@ -787,7 +823,7 @@ e=>{
     const delta =
     e.clientX - lastX;
 
-    scrollOffset += delta * 0.4;
+    scrollOffset += delta * 0.15;
 
     lastX = e.clientX;
 
