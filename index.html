@@ -414,8 +414,13 @@ setTimeout(() => {
 
 const carousel = document.getElementById("carousel");
 const dropZone = document.getElementById("dropZone");
-
 let chosen = false;
+let autoRotate = true;
+let draggingCard = null;
+
+let scrollOffset = 0;
+let isMoving = false;
+let lastX = 0;
 
 /* ========= CRIAR CARTAS ========= */
 
@@ -506,12 +511,90 @@ function arrangeCards(){
 }
 
 arrangeCards();
+function autoSpin(){
+
+    if(autoRotate && !chosen){
+
+        scrollOffset += 0.01;
+
+        updateCarousel();
+
+    }
+
+    requestAnimationFrame(
+    autoSpin
+    );
+
+}
+
+autoSpin();
 
 window.addEventListener(
 "resize",
 arrangeCards
 );
+function updateCarousel(){
 
+    const isMobile =
+    window.innerWidth < 700;
+
+    const centerX =
+    window.innerWidth / 2;
+
+    const radius =
+    isMobile ? 720 : 1200;
+
+    const startAngle =
+    isMobile ? -36 : -34;
+
+    const endAngle =
+    isMobile ? 36 : 34;
+
+    cards.forEach((card,index)=>{
+
+        if(card.classList.contains(
+        "selected-card"
+        )) return;
+
+        if(card === draggingCard)
+        return;
+
+        const angle =
+        startAngle +
+        ((endAngle-startAngle) /
+        (cards.length-1))
+        * index +
+        scrollOffset;
+
+        const rad =
+        angle * Math.PI / 180;
+
+        const x =
+        centerX +
+        Math.sin(rad) * radius;
+
+        const y =
+        Math.cos(rad) * radius;
+
+        card.style.left =
+        (x - 48) + "px";
+
+        card.style.bottom =
+        (
+            isMobile
+            ? (-620 + y)
+            : (-1030 + y)
+        ) + "px";
+
+        card.style.transform =
+        `rotate(${angle}deg)`;
+
+        card.style.zIndex =
+Math.round(10000 + y);
+
+    });
+
+}
 /* ========= DRAG ========= */
 
 cards.forEach(card=>{
@@ -525,20 +608,26 @@ cards.forEach(card=>{
 
         if(chosen) return;
 
+        autoRotate = false;
+
         holdTimer = setTimeout(()=>{
 
-            dragging = true;
+    draggingCard = card;
 
-            card.style.transition =
-            "none";
+    dragging = true;
 
-            card.style.zIndex =
-            "99999";
+    isMoving = false;
 
-            card.style.transform =
-            "rotate(0deg) scale(1.08)";
+    card.style.transition =
+    "none";
 
-        },250);
+    card.style.zIndex =
+    "99999";
+
+    card.style.transform =
+    "rotate(0deg) scale(1.08)";
+
+},300);
 
     });
 
@@ -580,11 +669,11 @@ cards.forEach(card=>{
         "fixed";
 
         card.style.left =
-        (e.clientX - cardWidth / 2)
+        (e.clientX - cardWidth/2)
         + "px";
 
         card.style.top =
-        (e.clientY - cardHeight / 2)
+        (e.clientY - cardHeight/2)
         + "px";
 
         card.style.bottom =
@@ -672,13 +761,20 @@ cards.forEach(card=>{
 
         }else{
 
-            card.style.transition =
-            "all .35s ease";
+            draggingCard = null;
 
-            arrangeCards();
+card.style.position =
+"absolute";
 
-        }
+card.style.top =
+"auto";
 
+card.style.transition =
+"all .35s ease";
+
+updateCarousel();
+
+}
         dropZone.classList.remove(
         "active"
         );
@@ -709,8 +805,8 @@ function revealCard(card){
     const randomCard =
     cardNames[
         Math.floor(
-            Math.random() *
-            cardNames.length
+        Math.random() *
+        cardNames.length
         )
     ];
 
@@ -799,17 +895,16 @@ function revealCard(card){
 }
 /* ========= CARROSSEL ========= */
 
-let scrollOffset = 0;
-let isMoving = false;
-let lastX = 0;
-
 carousel.addEventListener(
 "pointerdown",
 e=>{
 
     if(chosen) return;
 
+    autoRotate = false;
+
     isMoving = true;
+
     lastX = e.clientX;
 
 });
@@ -818,67 +913,20 @@ window.addEventListener(
 "pointermove",
 e=>{
 
-    if(!isMoving || chosen) return;
+    if(chosen) return;
+
+    if(!isMoving) return;
+
+    if(draggingCard) return;
 
     const delta =
     e.clientX - lastX;
 
-    scrollOffset += delta * 0.15;
+    scrollOffset += delta * 0.12;
 
     lastX = e.clientX;
 
-    const isMobile =
-    window.innerWidth < 700;
-
-    const centerX =
-    window.innerWidth / 2;
-
-    const radius =
-    isMobile ? 720 : 1200;
-
-    const startAngle =
-    isMobile ? -36 : -34;
-
-    const endAngle =
-    isMobile ? 36 : 34;
-
-    cards.forEach((card,index)=>{
-
-        if(card.classList.contains(
-        "selected-card"
-        )) return;
-
-        const angle =
-        startAngle +
-        ((endAngle - startAngle) /
-        (cards.length - 1))
-        * index +
-        (scrollOffset * 0.03);
-
-        const rad =
-        angle * Math.PI / 180;
-
-        const x =
-        centerX +
-        Math.sin(rad) * radius;
-
-        const y =
-        Math.cos(rad) * radius;
-
-        card.style.left =
-        (x - 48) + "px";
-
-        card.style.bottom =
-        (
-            isMobile
-            ? (-620 + y)
-            : (-1030 + y)
-        ) + "px";
-
-        card.style.transform =
-        `rotate(${angle}deg)`;
-
-    });
+    updateCarousel();
 
 });
 
@@ -889,7 +937,6 @@ window.addEventListener(
     isMoving = false;
 
 });
-
 </script>
 
 </body>
